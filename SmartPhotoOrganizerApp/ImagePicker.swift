@@ -1,3 +1,11 @@
+//
+//  ImagePicker.swift
+//  SmartPhotoOrganizerApp
+//
+//  Created by Pranav Pratap Singh on 1/21/25.
+//
+
+
 import SwiftUI
 import UIKit
 
