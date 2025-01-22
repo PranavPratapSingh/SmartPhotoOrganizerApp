@@ -3,35 +3,31 @@ import Photos
 
 struct PhotosView: View {
     @State private var photos: [PHAsset] = []
-    @State private var currentIndex: Int = 0 // Track the current photo index
-    @State private var showImageOverlay: Bool = false // Control overlay visibility
-    @State private var selectedImage: UIImage? // Store the selected image for the overlay
+    @State private var currentIndex: Int = 0
+    @State private var showImageOverlay: Bool = false
+    @State private var selectedImage: UIImage?
+    @State private var photoCell: PhotoCell?
     
     var body: some View {
         ZStack {
             VStack {
                 if !photos.isEmpty {
-                    PhotoCell(asset: photos[currentIndex], onDelete: {
-                        // Remove the photo from the array
-                        photos.remove(at: currentIndex)
-                        refreshPhoto() // Refresh to show a new random photo
-                    }, onKeep: {
-                        // Remove the photo from the array
-                        photos.remove(at: currentIndex)
-                        refreshPhoto() // Refresh to show a new random photo
-                    })
-                    .frame(maxHeight: .infinity) // Allow the photo to take full height
-                    .onTapGesture {
-                        loadImageForOverlay() // Load the image for the overlay
-                        showImageOverlay.toggle() // Show the overlay
+                    
+                    if let photoCell{
+                        
+                        photoCell.frame(maxHeight: .infinity)
+                            .onTapGesture {
+                                loadImageForOverlay()
+                                showImageOverlay.toggle()
+                            }
                     }
                     
                     HStack {
                         Button(action: {
                             if currentIndex > 0 {
-                                currentIndex -= 1 // Go to the previous photo
+                                currentIndex -= 1
+                                refreshPhoto()
                             }
-                            refreshPhoto() // Refresh to show a new random photo
                         }) {
                             Text("Previous")
                                 .padding()
@@ -39,15 +35,15 @@ struct PhotosView: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
-                        .disabled(currentIndex == 0) // Disable if at the first photo
+                        .disabled(currentIndex == 0)
                         
                         Spacer()
                         
                         Button(action: {
                             if currentIndex < photos.count - 1 {
-                                currentIndex += 1 // Go to the next photo
+                                currentIndex += 1
+                                refreshPhoto()
                             }
-                            refreshPhoto() // Refresh to show a new random photo
                         }) {
                             Text("Next")
                                 .padding()
@@ -55,7 +51,7 @@ struct PhotosView: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
-                        .disabled(currentIndex == photos.count - 1) // Disable if at the last photo
+                        .disabled(currentIndex == photos.count - 1)
                     }
                     .padding()
                 } else {
@@ -65,12 +61,11 @@ struct PhotosView: View {
                 }
             }
             
-            // Overlay for displaying the selected image
             if showImageOverlay, let image = selectedImage {
-                Color.black.opacity(0.8) // Background dimming
+                Color.black.opacity(0.8)
                     .edgesIgnoringSafeArea(.all)
                     .onTapGesture {
-                        showImageOverlay.toggle() // Hide overlay on tap
+                        showImageOverlay.toggle()
                     }
                 
                 Image(uiImage: image)
@@ -95,14 +90,27 @@ struct PhotosView: View {
             fetchedPhotos.append(asset)
         }
         
-        // Shuffle the photos
         photos = fetchedPhotos.shuffled()
-        refreshPhoto() // Show a random photo on load
+        refreshPhoto()
+        if !photos.isEmpty {
+            photoCell = PhotoCell(asset: photos[currentIndex], onDelete: {
+                                                                    photos.remove(at: currentIndex)
+                                                                    refreshPhoto()
+                                                                }, onKeep: {
+                                                                    photos.remove(at: currentIndex)
+                                                                    refreshPhoto()
+                                                                })
+
+        }
     }
     
     private func refreshPhoto() {
         if !photos.isEmpty {
-            currentIndex = Int.random(in: 0..<photos.count) // Select a random index
+            currentIndex = Int.random(in: 0..<photos.count)
+            guard var cell = photoCell else { return }
+            cell.asset = photos[currentIndex]
+            photoCell = cell
+
         }
     }
     
@@ -113,7 +121,7 @@ struct PhotosView: View {
         
         imageManager.requestImage(for: photos[currentIndex], targetSize: PHImageManagerMaximumSize, contentMode: .aspectFill, options: options) { (result, _) in
             if let result = result {
-                selectedImage = result // Set the selected image for the overlay
+                selectedImage = result
             }
         }
     }

@@ -58,18 +58,18 @@ struct ContentView: View {
                         .cornerRadius(8)
                 }
 
-//                Button(action: {
-//                                    findDuplicates()
-//                                }) {
-//                                    Text("Find Duplicates")
-//                                        .padding()
-//                                        .background(Color.red)
-//                                        .foregroundColor(.white)
-//                                        .cornerRadius(8)
-//                                }
-//                                .sheet(isPresented: $showDuplicatesView) {
-//                                    DuplicatesView(duplicates: duplicates)
-//                                }
+                Button(action: {
+                                    findDuplicates()
+                                }) {
+                                    Text("Find Duplicates")
+                                        .padding()
+                                        .background(Color.red)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(8)
+                                }
+                                .sheet(isPresented: $showDuplicatesView) {
+                                    DuplicatesView(duplicates: duplicates)
+                                }
 //                Button(action: {
 //                    // Action for applying filters
 //                    applyFilters()
@@ -176,13 +176,13 @@ struct ContentView: View {
 //            print("Fetched asset: \(asset.localIdentifier)") // Debugging line
         }
     }
-//
-//    private func findDuplicates() {
-//            duplicates = DuplicateFinder.findDuplicates(photos: photos)
-//            showDuplicatesView = !duplicates.isEmpty
-//            print("Find Duplicates tapped")
-//        }
-//
+
+    private func findDuplicates() {
+            duplicates = DuplicateFinder.findDuplicates(photos: photos)
+            showDuplicatesView = !duplicates.isEmpty
+            print("Find Duplicates tapped")
+        }
+
 //    private func applyFilters() {
 //        // Implement the logic to apply filters
 //        print("Apply Filters tapped")

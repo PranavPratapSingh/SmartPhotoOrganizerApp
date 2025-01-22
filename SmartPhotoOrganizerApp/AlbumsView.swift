@@ -13,7 +13,7 @@ struct AlbumsView: View {
     @State private var albums: [PHAssetCollection] = []
     
     var body: some View {
-        if !albums.isEmpty{
+        
             List(albums, id: \.self) { album in
                 NavigationLink(destination: PhotosInAlbumView(album: album)) {
                     Text(album.localizedTitle ?? "Untitled Album")
@@ -23,7 +23,7 @@ struct AlbumsView: View {
             .onAppear {
                 loadAlbums()
             }
-        }else {
+        if albums.isEmpty{
                     Text("No albums available.")
                         .font(.headline)
                         .padding()
