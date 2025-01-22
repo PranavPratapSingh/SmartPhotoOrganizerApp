@@ -24,34 +24,26 @@ struct PhotosView: View {
                     
                     HStack {
                         Button(action: {
-                            if currentIndex > 0 {
-                                currentIndex -= 1
-                                refreshPhoto()
-                            }
+                            deletePhoto()
                         }) {
-                            Text("Previous")
+                            Text("Delete")
                                 .padding()
                                 .background(Color.blue)
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
-                        .disabled(currentIndex == 0)
                         
                         Spacer()
                         
                         Button(action: {
-                            if currentIndex < photos.count - 1 {
-                                currentIndex += 1
-                                refreshPhoto()
-                            }
+                            keepPhoto()
                         }) {
-                            Text("Next")
+                            Text("Keep")
                                 .padding()
                                 .background(Color.blue)
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
-                        .disabled(currentIndex == photos.count - 1)
                     }
                     .padding()
                 } else {
@@ -125,4 +117,23 @@ struct PhotosView: View {
             }
         }
     }
+    private func deletePhoto() {
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetChangeRequest.deleteAssets([photos[currentIndex]] as NSArray)
+            }) { success, error in
+                if success {
+                    print("Deleted photo: \(photos[currentIndex].localIdentifier)")
+                    photos.remove(at: currentIndex)
+                    refreshPhoto()
+                } else if let error = error {
+                    print("Error deleting photo: \(error.localizedDescription)")
+                }
+            }
+        }
+        
+        private func keepPhoto() {
+            print("Kept photo: \(photos[currentIndex].localIdentifier)")
+            photos.remove(at: currentIndex)
+            refreshPhoto()
+        }
 }
