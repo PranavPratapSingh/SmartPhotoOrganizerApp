@@ -49,19 +49,22 @@ struct PhotoSelectionView: View {
         }
     }
 
+    
     private func loadPhotos() {
-        let fetchOptions = PHFetchOptions()
-        let assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-
-        var fetchedPhotos: [PHAsset] = []
-        assets.enumerateObjects { (asset, _, _) in
-            fetchedPhotos.append(asset)
-            print("Fetched photo: \(asset.localIdentifier)")
+            print("Loading photos...")
+            let fetchOptions = PHFetchOptions()
+            let assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+            
+            var fetchedPhotos: [PHAsset] = []
+            assets.enumerateObjects { (asset, _, _) in
+                fetchedPhotos.append(asset)
+                print("Fetched photo: \(asset.localIdentifier)")
+            }
+            
+            // Shuffle the photos
+            photos = fetchedPhotos.shuffled()
+            print("Total photos loaded: \(photos.count)")
         }
-
-        photos = fetchedPhotos
-        print("Total photos loaded: \(photos.count)")
-    }
 
     private func toggleSelection(for asset: PHAsset) {
         if let index = selectedPhotos.firstIndex(of: asset) {

@@ -35,7 +35,7 @@ struct ContentView: View {
 //                }
 
                 NavigationLink(destination: PhotosView()) {
-                                    Text("View All Photos")
+                                    Text("PhotoSwiper")
                                         .padding()
                                         .background(Color.blue)
                                         .foregroundColor(.white)

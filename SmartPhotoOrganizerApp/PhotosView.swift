@@ -3,6 +3,7 @@ import Photos
 
 struct PhotosView: View {
     @State private var photos: [PHAsset] = []
+    @State private var photosToBeDeleted: [PHAsset] = []
     @State private var currentIndex: Int = 0
     @State private var showImageOverlay: Bool = false
     @State private var selectedImage: UIImage?
@@ -34,6 +35,20 @@ struct PhotosView: View {
                         }
                         
                         Spacer()
+                        
+                        Button(action: {
+                                deletePhotoArray()
+                            }) {
+                                Text("Done")
+                                    .padding()
+                                    .background(Color.green)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                            }
+                        .padding()
+                    
+                        Spacer()
+                    
                         
                         Button(action: {
                             keepPhoto() // Keep the current photo
@@ -104,24 +119,29 @@ struct PhotosView: View {
             }
         }
     }
-    
+    private func deletePhotoArray() {
+        guard !photosToBeDeleted.isEmpty else { return }
+        
+        print("Attempting to delete photoArray of size: \(photosToBeDeleted.count)")
+        
+        PHPhotoLibrary.shared().performChanges({
+            PHAssetChangeRequest.deleteAssets(photosToBeDeleted as NSArray)
+        }) { success, error in
+            if success {
+                print("Deleted photos count: \(photosToBeDeleted.count)")
+            }else if let error = error {
+                print("Error deleting photo: \(error.localizedDescription)")
+            }
+        }
+    }
     private func deletePhoto() {
         guard !photos.isEmpty else { return }
         
         let photoToDelete = photos[currentIndex]
         print("Attempting to delete photo: \(photoToDelete.localIdentifier)")
-        
-        PHPhotoLibrary.shared().performChanges({
-            PHAssetChangeRequest.deleteAssets([photoToDelete] as NSArray)
-        }) { success, error in
-            if success {
-                print("Deleted photo: \(photoToDelete.localIdentifier)")
-                photos.remove(at: currentIndex) // Remove the current photo from the array
-                updateCurrentIndex() // Update to show a new photo
-            } else if let error = error {
-                print("Error deleting photo: \(error.localizedDescription)")
-            }
-        }
+        photosToBeDeleted.append(photoToDelete)
+        photos.remove(at: currentIndex)
+        updateCurrentIndex()
     }
     
     private func keepPhoto() {

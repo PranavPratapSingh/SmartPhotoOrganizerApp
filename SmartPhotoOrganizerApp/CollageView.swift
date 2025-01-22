@@ -5,20 +5,22 @@ struct CollageView: View {
     var selectedPhotos: [PHAsset]
     
     var body: some View {
-        VStack {
-            Text("Collage")
-                .font(.largeTitle)
-                .padding()
-            
-            // Create a grid layout for the collage
-            let columns = Array(repeating: GridItem(.flexible()), count: min(selectedPhotos.count, 5))
-            LazyVGrid(columns: columns) {
-                ForEach(selectedPhotos, id: \.self) { asset in
-                    ImageView(asset: asset)
-                        .frame(height: 100) // Set a fixed height for the collage images
+        NavigationView {
+            VStack {
+                Text("Collage")
+                    .font(.largeTitle)
+                    .padding()
+                
+                // Create a grid layout for the collage
+                let columns = Array(repeating: GridItem(.flexible()), count: min(selectedPhotos.count, 5))
+                LazyVGrid(columns: columns) {
+                    ForEach(selectedPhotos, id: \.self) { asset in
+                        ImageView(asset: asset)
+                            .frame(height: 100) // Set a fixed height for the collage images
+                    }
                 }
+                .padding()
             }
-            .padding()
         }
     }
 }
