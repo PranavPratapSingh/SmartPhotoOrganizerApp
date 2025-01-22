@@ -124,6 +124,14 @@ struct ContentView: View {
 //                        .foregroundColor(.white)
 //                        .cornerRadius(8)
 //                }
+                NavigationLink(destination: PhotoSelectionView()) {
+                                    Text("Create Collage")
+                                        .padding()
+                                        .background(Color.blue)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(8)
+                                }
+                                .padding()
 
                 List {
                     ForEach(photos, id: \.self) { photo in

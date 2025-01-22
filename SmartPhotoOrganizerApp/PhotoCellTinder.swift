@@ -1,17 +1,17 @@
 import SwiftUI
 import Photos
 
-struct PhotoCell: View {
+struct PhotoCellTinder: View {
     var asset: PHAsset
-    var onDelete: () -> Void // Closure to call when deleting
-    var onKeep: () -> Void // Closure to call when keeping
+    var onDelete: () -> Void
+    var onKeep: () -> Void
     
     @State private var image: UIImage?
     @State private var showMetadata: Bool = false
-    @State private var offset: CGSize = .zero // Track the drag offset
+    @State private var offset: CGSize = .zero
     
     var body: some View {
-        LazyVStack {
+        VStack {
             if let image = image {
                 Image(uiImage: image)
                     .resizable()
@@ -25,9 +25,9 @@ struct PhotoCell: View {
                             }
                             .onEnded { gesture in
                                 if gesture.translation.width < -100 {
-                                    deletePhoto() // Swipe left to delete
+                                    onDelete()
                                 } else if gesture.translation.width > 100 {
-                                    keepPhoto() // Swipe right to keep
+                                    onKeep()
                                 }
                                 offset = .zero // Reset offset after swipe
                             }
@@ -37,14 +37,12 @@ struct PhotoCell: View {
                     .fill(Color.gray)
                     .frame(maxWidth: .infinity, minHeight: 200)
             }
-            Text(asset.localIdentifier)
-                .lineLimit(1)
-                .padding(.top, 5)
+           
         }
         .onAppear {
             loadImage() // Load the image when the view appears
         }
-        .onChange(of:asset) { _ in
+        .onChange(of:asset, initial:true) {
             loadImage() // Reload the image when the asset changes
         }
         .onTapGesture {
@@ -69,23 +67,23 @@ struct PhotoCell: View {
         }
     }
     
-    private func deletePhoto() {
-        PHPhotoLibrary.shared().performChanges({
-            PHAssetChangeRequest.deleteAssets([asset] as NSArray)
-        }) { success, error in
-            if success {
-                print("Deleted photo: \(asset.localIdentifier)")
-                onDelete() // Call the onDelete closure
-            } else if let error = error {
-                print("Error deleting photo: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    private func keepPhoto() {
-        print("Kept photo: \(asset.localIdentifier)")
-        onKeep() // Call the onKeep closure
-    }
+//    private func deletePhoto() {
+//        PHPhotoLibrary.shared().performChanges({
+//            PHAssetChangeRequest.deleteAssets([asset] as NSArray)
+//        }) { success, error in
+//            if success {
+//                print("Deleted photo: \(asset.localIdentifier)")
+//                onDelete() // Call the onDelete closure
+//            } else if let error = error {
+//                print("Error deleting photo: \(error.localizedDescription)")
+//            }
+//        }
+//    }
+//    
+//    private func keepPhoto() {
+//        print("Kept photo: \(asset.localIdentifier)")
+//        onKeep() // Call the onKeep closure
+//    }
     
     private func getMetadata() -> String {
         var metadata = "Local Identifier: \(asset.localIdentifier)\n"
@@ -95,6 +93,14 @@ struct PhotoCell: View {
         if let location = asset.location {
             metadata += "Location: \(location.coordinate.latitude), \(location.coordinate.longitude)\n"
         }
+        if let fav = asset.isFavorite ? "Favorite" : "Not Favorite" {
+            
+            metadata += "is Favorite: \(fav)\n"
+        }
+        if let sourceInformation = asset.location?.sourceInformation {
+                    
+                    metadata += "Source Information: \(sourceInformation)\n"
+                }
         return metadata
     }
 }

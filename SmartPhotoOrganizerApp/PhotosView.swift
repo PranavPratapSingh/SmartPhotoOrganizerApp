@@ -6,29 +6,29 @@ struct PhotosView: View {
     @State private var currentIndex: Int = 0
     @State private var showImageOverlay: Bool = false
     @State private var selectedImage: UIImage?
-    @State private var photoCell: PhotoCell?
-    
+
     var body: some View {
         ZStack {
             VStack {
                 if !photos.isEmpty {
-                    
-                    if let photoCell{
-                        
-                        photoCell.frame(maxHeight: .infinity)
-                            .onTapGesture {
-                                loadImageForOverlay()
-                                showImageOverlay.toggle()
-                            }
+                    PhotoCellTinder(asset: photos[currentIndex],onDelete: {
+                        deletePhoto()
+                    }, onKeep: {
+                        keepPhoto()
+                    })
+                    .frame(maxHeight: .infinity)
+                    .onTapGesture {
+                        loadImageForOverlay(asset: photos[currentIndex])
+                        showImageOverlay.toggle()
                     }
                     
                     HStack {
                         Button(action: {
-                            deletePhoto()
+                            deletePhoto() // Delete the current photo
                         }) {
                             Text("Delete")
                                 .padding()
-                                .background(Color.blue)
+                                .background(Color.red)
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
@@ -36,11 +36,11 @@ struct PhotosView: View {
                         Spacer()
                         
                         Button(action: {
-                            keepPhoto()
+                            keepPhoto() // Keep the current photo
                         }) {
                             Text("Keep")
                                 .padding()
-                                .background(Color.blue)
+                                .background(Color.green)
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
@@ -53,11 +53,12 @@ struct PhotosView: View {
                 }
             }
             
+            // Overlay for displaying the selected image
             if showImageOverlay, let image = selectedImage {
                 Color.black.opacity(0.8)
                     .edgesIgnoringSafeArea(.all)
                     .onTapGesture {
-                        showImageOverlay.toggle()
+                        showImageOverlay.toggle() // Hide overlay on tap
                     }
                 
                 Image(uiImage: image)
@@ -74,66 +75,71 @@ struct PhotosView: View {
     }
     
     private func loadPhotos() {
+        print("Loading photos...")
         let fetchOptions = PHFetchOptions()
         let assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
         
         var fetchedPhotos: [PHAsset] = []
         assets.enumerateObjects { (asset, _, _) in
             fetchedPhotos.append(asset)
+            print("Fetched photo: \(asset.localIdentifier)")
         }
         
+        // Shuffle the photos
         photos = fetchedPhotos.shuffled()
-        refreshPhoto()
-        if !photos.isEmpty {
-            photoCell = PhotoCell(asset: photos[currentIndex], onDelete: {
-                                                                    photos.remove(at: currentIndex)
-                                                                    refreshPhoto()
-                                                                }, onKeep: {
-                                                                    photos.remove(at: currentIndex)
-                                                                    refreshPhoto()
-                                                                })
-
-        }
+        print("Total photos loaded: \(photos.count)")
+        currentIndex = 0 // Start with the first photo
+        print("Current index set to: \(currentIndex)")
     }
     
-    private func refreshPhoto() {
-        if !photos.isEmpty {
-            currentIndex = Int.random(in: 0..<photos.count)
-            guard var cell = photoCell else { return }
-            cell.asset = photos[currentIndex]
-            photoCell = cell
-
-        }
-    }
-    
-    private func loadImageForOverlay() {
+    private func loadImageForOverlay(asset: PHAsset) {
         let imageManager = PHImageManager.default()
         let options = PHImageRequestOptions()
         options.isSynchronous = true
         
-        imageManager.requestImage(for: photos[currentIndex], targetSize: PHImageManagerMaximumSize, contentMode: .aspectFill, options: options) { (result, _) in
+        imageManager.requestImage(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFill, options: options) { (result, _) in
             if let result = result {
-                selectedImage = result
+                selectedImage = result // Set the selected image for the overlay
+                print("Loaded image for overlay: \(asset.localIdentifier)")
             }
         }
     }
+    
     private func deletePhoto() {
-            PHPhotoLibrary.shared().performChanges({
-                PHAssetChangeRequest.deleteAssets([photos[currentIndex]] as NSArray)
-            }) { success, error in
-                if success {
-                    print("Deleted photo: \(photos[currentIndex].localIdentifier)")
-                    photos.remove(at: currentIndex)
-                    refreshPhoto()
-                } else if let error = error {
-                    print("Error deleting photo: \(error.localizedDescription)")
-                }
+        guard !photos.isEmpty else { return }
+        
+        let photoToDelete = photos[currentIndex]
+        print("Attempting to delete photo: \(photoToDelete.localIdentifier)")
+        
+        PHPhotoLibrary.shared().performChanges({
+            PHAssetChangeRequest.deleteAssets([photoToDelete] as NSArray)
+        }) { success, error in
+            if success {
+                print("Deleted photo: \(photoToDelete.localIdentifier)")
+                photos.remove(at: currentIndex) // Remove the current photo from the array
+                updateCurrentIndex() // Update to show a new photo
+            } else if let error = error {
+                print("Error deleting photo: \(error.localizedDescription)")
             }
         }
+    }
+    
+    private func keepPhoto() {
+        guard !photos.isEmpty else { return }
         
-        private func keepPhoto() {
-            print("Kept photo: \(photos[currentIndex].localIdentifier)")
-            photos.remove(at: currentIndex)
-            refreshPhoto()
+        print("Keeping photo: \(photos[currentIndex].localIdentifier)")
+        photos.remove(at: currentIndex) // Remove the current photo from the array
+        updateCurrentIndex() // Update to show a new photo
+    }
+    
+    private func updateCurrentIndex() {
+        if photos.isEmpty {
+            print("No photos left. Resetting current index to 0.")
+            currentIndex = 0 // Reset to 0 if no photos left
+        } else {
+            // Ensure currentIndex is valid
+            currentIndex = min(currentIndex, photos.count - 1)
+            print("Updated current index to: \(currentIndex)")
         }
+    }
 }
