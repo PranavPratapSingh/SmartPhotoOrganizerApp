@@ -55,6 +55,13 @@ Welcome to the **Smart Photo Organizer** app! This Swift-based application provi
 - **Create Collages**: Combine multiple photos into beautiful collages with ease.
 - **Color Palette Extractor**: Extract dominant colors from your photos for creative inspiration.
 
+### Scrrenshots
+<p align="left">
+  <img alt="MainScreen" src="https://github.com/PranavPratapSingh/SmartPhotoOrganizerApp/blob/main/Photos/IMG_5911.PNG" height="500"/>
+  <img alt="YourScreen" src="https://github.com/PranavPratapSingh/SmartPhotoOrganizerApp/blob/main/Photos/IMG_5912.PNG" height="500"/>
+  <img alt="DeleteConfirm" src="https://github.com/PranavPratapSingh/SmartPhotoOrganizerApp/blob/main/Photos/IMG_5913.PNG" height="500"/>
+</p>
+
 ## Contributing
 
 Contributions are welcome! If you have ideas, suggestions, or bug reports, feel free to open an issue or submit a pull request. Follow the standard [GitHub workflow](https://docs.github.com/en/get-started/quickstart/contributing-to-projects).
