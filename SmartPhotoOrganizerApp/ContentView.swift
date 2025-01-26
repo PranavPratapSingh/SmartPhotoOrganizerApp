@@ -134,10 +134,10 @@ struct ContentView: View {
                                 .padding()
 
                 List {
-                    ForEach(photos, id: \.self) { photo in
-                        // Display photo thumbnail
-                        Text("Photo: \(photo.localIdentifier)")
-                    }
+//                    ForEach(photos, id: \.self) { photo in
+//                        // Display photo thumbnail
+//                        Text("Photo: \(photo.localIdentifier)")
+//                    }
                 }
             }
             .navigationTitle("Smart Photo Organizer")
